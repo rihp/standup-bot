@@ -45,6 +45,48 @@ for (const file of commandFiles) {
 }
 
 
+// Prepare bot
+bot.once("ready", () => {
+    console.log("Discord Bot Ready")
+//   ... this prompts members if it is re-deployed and time criteria is met
+//    if(Date.now() < (new Date()).setHours(10, 30)) {
+//      promptMembers();
+//    }
+  });
+
+
+// when a user enters a command
+bot.on("message", async (message) => {
+
+    console.log(" ~ message received!")
+    if (!message.content.startsWith(PREFIX) || message.author.bot) return;
+  
+    const args = message.content.slice(PREFIX.length).trim().split(/ +/);
+    const commandName = args.shift().toLowerCase();
+  
+    if (!bot.commands.has(commandName)) return;
+  
+    if (message.mentions.users.has(bot.user.id))
+      return message.channel.send(":robot:");
+  
+    const command = bot.commands.get(commandName);
+  
+    if (command.guildOnly && message.channel.type === "dm") {
+      return message.channel.send("Hmm, that command cannot be used in a dm!");
+    }
+  
+    try {
+      await command.execute(message, args);
+    } catch (error) {
+      console.error(error);
+      message.channel.send(`Error 8008135: Something went wrong!`);
+    }
+  });
+
+
+bot.login(process.env.DISCORD_TOKEN);
+
+
 console.log(" ~ this is how we do it")
 
 
