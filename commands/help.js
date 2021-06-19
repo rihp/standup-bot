@@ -1,4 +1,6 @@
-const PREFIX = "!";
+require("dotenv").config();
+const PREFIX = process.env.PREFIX
+//const PREFIX = "!";
 
 /**
  * !help command - Lists out all the available commands
@@ -46,7 +48,7 @@ module.exports = {
       return message.reply("Uh Oh! Not a valid command");
     }
 
-    data.push(`**Name:** ${command.name}`);
+    data.push(`**Command Name:** ${command.name}`);
 
     if (command.description)
       data.push(`**Description:** *${command.description}*`);
