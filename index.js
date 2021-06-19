@@ -21,8 +21,30 @@ require("dotenv").config();
 
 // _RIHP_
 //
-// simulate .env file
-//const params = require("./params");
-//import * as params from './params.js'
-console.log(process.env.PREFIX)
-console.log("this is how we do it")
+const fs = require("fs");
+const { Client, MessageEmbed, Collection } = require("discord.js");
+
+const PREFIX = process.env.PREFIX
+
+
+console.log(" ~ loading up commands"); 
+
+// lists .js files in commands dir
+const commandFiles = fs
+  .readdirSync("./commands")
+  .filter((file) => file.endsWith(".js"));
+
+// init bot client with a collection of commands
+const bot = new Client();
+bot.commands = new Collection();
+
+// Imports the command file + adds the command to the bot commands collection
+for (const file of commandFiles) {
+  const command = require(`./commands/${file}`);
+  bot.commands.set(command.name, command);
+}
+
+
+console.log(" ~ this is how we do it")
+
+
