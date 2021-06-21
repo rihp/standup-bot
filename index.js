@@ -9,7 +9,42 @@
  *  - schedule: for running the cron jobs
  *  - standup.model: the model for the standup stored in mongo
  */
+
 require("dotenv").config();
+const notionClient = require("@notionhq/client")
+
+const notion = new notionClient.Client({ auth: process.env.NOTION_KEY })
+
+const databaseId = process.env.NOTION_DATABASE_ID
+
+async function addItem(text) {
+  try {
+    await notion.request({
+      path: "pages",
+      method: "POST",
+      body: {
+        parent: { database_id: databaseId },
+        properties: {
+          title: { 
+            title:[
+              {
+                "text": {
+                  "content": text
+                }
+              }
+            ]
+          }
+        }
+      },
+    })
+    console.log("Success! Entry added.")
+  } catch (error) {
+    console.error(error.body)
+  }
+}
+
+addItem("Yurts in Big Sur, California")
+
 //const fs = require("fs");
 //const mongoose = require("mongoose");
 //const { Client, MessageEmbed, Collection } = require("discord.js");
