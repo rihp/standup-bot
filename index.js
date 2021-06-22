@@ -11,13 +11,50 @@
  */
 
 require("dotenv").config();
+
+
+  // / / / / / / / / / / / / / / / / / / /
+ // NOTION API CONFIG 
+// use `const = require("...")` because the file uses ES5, and this stack doesnt have babel installed, so you cannot use `import {} from ...`
 const notionClient = require("@notionhq/client")
-
 const notion = new notionClient.Client({ auth: process.env.NOTION_KEY })
-
 const databaseId = process.env.NOTION_DATABASE_ID
 
-async function addItem(text) {
+const getDatabases = async () => {
+    const databases = await notion.databases.list();
+
+    console.log(databases);
+};
+getDatabases()
+
+const getAllApplications = async (req, res) => {
+    const data = await notion.databases.query({
+        database_id: process.env.NOTION_DATABASE_ID
+    });
+
+    const pages = data.results.map(page => {
+        return {
+            id: page.id,
+            created: page.created_time,
+            updated: page.last_edited_time,
+            title: page.properties.Title.title[0],
+  //          date: page.properties.date[rich_text],
+   //         username: page.properties.username[rich_text],
+//            position: page.properties.Position.select.name,
+//            status: page.properties.Status.select.name,
+//            deadline: page.properties['Next Deadline'].date.start,
+//            jobDescription: page.properties['Job Description'].url,
+//            comments: page.properties.Comments.rich_text[0].plain_text
+        }
+    });
+    console.log(" ~ Mapped data:")
+    console.log(pages)
+    return pages;
+};
+
+getAllApplications()
+
+async function addItem(username, text) {
   try {
     await notion.request({
       path: "pages",
@@ -32,18 +69,25 @@ async function addItem(text) {
                   "content": text
                 }
               }
+            ],
+            username: [
+                {
+                "text": {
+                    "content": username
+                }
+                }
             ]
           }
         }
       },
     })
-    console.log("Success! Entry added.")
+    console.log(" ~ Success! Entry added.")
   } catch (error) {
     console.error(error.body)
   }
 }
 
-addItem("Yurts in Big Sur, California")
+// addItem("Roberto", "Yurts in Big Sur, California")
 
 //const fs = require("fs");
 //const mongoose = require("mongoose");
